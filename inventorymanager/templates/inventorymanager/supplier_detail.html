@@ -1,0 +1,16 @@
+{% extends "inventorymanager/layout.html" %}
+
+{% block body %}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Supplier: {{ supplier.name }}</h1>
+            <p><strong>Contact Name:</strong> {{ supplier.contact_name }}</p>
+            <p><strong>Contact Email:</strong> {{ supplier.contact_email }}</p>
+            <p><strong>Contact Phone:</strong> {{ supplier.contact_phone }}</p>
+        </div>
+    </div>
+</div>
+            
+{% endblock body %}
+    

@@ -15,6 +15,15 @@ urlpatterns = [
     path("create_order", views.create_order, name="create_order"),
     path("categories", views.category_view, name="categories"),
     path("create_category", views.create_category, name="create_category"),
+    # Detail views
+    path('supplier/<int:id>/', views.supplier_detail, name='supplier_detail'),
+    path('customer/<int:id>/', views.customer_detail, name='customer_detail'),
+    path('product/<int:id>/', views.product_detail, name='product_detail'),
+    path('order/<int:id>/', views.order_detail, name='order_detail'),
+    path('category/<int:id>/', views.category_detail, name='category_detail'),
+
+
+
 
 
 

@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="myTable" class="table table-bordered" id="testTable" width="100%" cellspacing="0">
+                    <table id="categoriesTable" class="table table-bordered" data-type="category" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -24,7 +24,7 @@
                         </thead>
                         <tbody>
                             {% for category in categories %}
-                            <tr>
+                            <tr data-id="{{ category.id }}">
                                 <td>{{ category.name}}</td>
                                 <td>{{ category.description}}</td>
                             </tr>

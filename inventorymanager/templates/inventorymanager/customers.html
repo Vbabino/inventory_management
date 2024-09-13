@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="myTable" class="table table-bordered" id="testTable" width="100%" cellspacing="0">
+                    <table id="customersTable" class="table table-bordered" data-type="customer" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -26,7 +26,7 @@
                         </thead>
                         <tbody>
                             {% for customer in customers %}
-                            <tr>
+                            <tr data-id="{{ customer.id }}">
                                 <td>{{ customer.first_name}}</td>
                                 <td>{{ customer.last_name}}</td>
                                 <td>{{ customer.email}}</td>

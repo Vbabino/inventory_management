@@ -1,0 +1,15 @@
+{% extends "inventorymanager/layout.html" %}
+
+{% block body %}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Customer: {{ customer.first_name }} {{ customer.last_name }}</h1>
+            <p>Email: {{ customer.email }}</p>
+            <p>Phone: {{ customer.phone }}</p>
+        </div>
+    </div>
+</div>
+            
+{% endblock body %}
+    

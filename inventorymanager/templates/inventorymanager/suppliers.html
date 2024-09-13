@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="myTable" class="table table-bordered" id="testTable" width="100%" cellspacing="0">
+                    <table id="suppliersTable" class="table table-bordered" data-type="supplier" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -26,7 +26,7 @@
                         </thead>
                         <tbody>
                             {% for supplier in suppliers %}
-                            <tr>
+                            <tr data-id="{{ supplier.id }}">
                                 <td>{{ supplier.name}}</td>
                                 <td>{{ supplier.contact_name}}</td>
                                 <td>{{ supplier.contact_email}}</td>

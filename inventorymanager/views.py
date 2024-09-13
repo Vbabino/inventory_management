@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -158,4 +158,28 @@ def create_category(request):
         form = CategoryForm()
     
     return render(request, 'inventorymanager/createCategory.html', {'form': form})
-    
+
+@login_required
+def supplier_detail(request, id):
+    supplier = get_object_or_404(Supplier, id=id)
+    return render(request, 'inventorymanager/supplier_detail.html', {'supplier': supplier})
+
+@login_required
+def customer_detail(request, id):
+    customer = get_object_or_404(Customer, id=id)
+    return render(request, 'inventorymanager/customer_detail.html', {'customer': customer})
+
+@login_required
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+    return render(request, 'inventorymanager/product_detail.html', {'product': product})
+
+@login_required
+def order_detail(request, id):
+    order = get_object_or_404(Order, id=id)
+    return render(request, 'inventorymanager/order_detail.html', {'order': order})
+
+@login_required
+def category_detail(request, id):
+    category = get_object_or_404(Category, id=id)
+    return render(request, 'inventorymanager/category_detail.html', {'category': category})
