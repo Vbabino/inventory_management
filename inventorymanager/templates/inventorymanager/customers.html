@@ -1,0 +1,44 @@
+{% extends "inventorymanager/layout.html" %}
+
+
+{% block body %}
+
+<h1 class="mt-4">Customers</h1>
+
+<a type="button" class="btn btn-primary mb-2" href="{% url 'create_customer' %}">Add Customer</a>
+
+<div class="container"></div>
+    <div class="card shadow mb-4">
+            <div class="card-header py-3">
+            
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered" id="testTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.first_name}}</td>
+                                <td>{{ customer.last_name}}</td>
+                                <td>{{ customer.email}}</td>
+                                <td>{{ customer.phone}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+            </div>
+        </div>
+</div>
+
+
+{% endblock body %}

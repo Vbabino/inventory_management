@@ -1,0 +1,43 @@
+{% extends "inventorymanager/layout.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+{% if messages %}
+<div class="messages mt-2">
+
+        {% for message in messages %}
+        <!-- Warning Messages-->
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <span{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</span>
+                        </div>        
+                {% endif %}
+        
+        {% endfor %}
+
+</div>
+{% endif %}
+<h1 class="mt-4">Create a New Order</h1>
+<form method="post">
+    {% csrf_token %}
+    
+    <h2>Order Details</h2>
+    {{ order_form|crispy }}
+
+    
+    <h2>Order Items</h2>
+    {{ order_item_formset.management_form }}
+    
+    {% for form in order_item_formset %}
+        <div>
+            {{ form|crispy }}
+
+        </div>
+    {% endfor %}
+    
+    <button type="submit" class="btn btn-primary">Submit Order</button>
+</form>
+
+{% endblock body %}
+    

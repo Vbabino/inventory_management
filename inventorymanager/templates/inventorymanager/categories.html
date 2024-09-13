@@ -1,0 +1,40 @@
+
+{% extends "inventorymanager/layout.html" %}
+
+{% block body %}
+
+<h1 class="mt-4">Categories</h1>
+
+<a type="button" class="btn btn-primary mb-2" href="{% url 'create_category' %}">Add Category</a>
+
+<div class="container"></div>
+    <div class="card shadow mb-4">
+            <div class="card-header py-3">
+            
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered" id="testTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>description</th>
+                    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in categories %}
+                            <tr>
+                                <td>{{ category.name}}</td>
+                                <td>{{ category.description}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+            </div>
+        </div>
+</div>
+
+
+{% endblock body %}
