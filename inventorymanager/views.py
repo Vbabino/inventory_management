@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import json
 from .forms import *
 
 def index(request):
@@ -177,9 +178,36 @@ def product_detail(request, id):
 @login_required
 def order_detail(request, id):
     order = get_object_or_404(Order, id=id)
-    return render(request, 'inventorymanager/order_detail.html', {'order': order})
+    orderItem = get_object_or_404(OrderItem, id=id)
+    return render(request, 'inventorymanager/order_detail.html', {
+        'order': order,
+        'orderItem': orderItem
+        })
 
 @login_required
 def category_detail(request, id):
     category = get_object_or_404(Category, id=id)
     return render(request, 'inventorymanager/category_detail.html', {'category': category})
+
+def edit_supplier(request,id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        edit_suppl = get_object_or_404(Supplier, id=id)
+        edit_suppl.name = data["name"]
+        edit_suppl.contact_name = data["contact_name"]
+        edit_suppl.contact_email = data["contact_email"]
+        edit_suppl.contact_phone = data["contact_phone"]
+        edit_suppl.save()
+        return JsonResponse({
+            "message": "changes successfully made",
+            "name": edit_suppl.name,  # Return the updated supplier details
+            "contact_name": edit_suppl.contact_name,
+            "contact_email": edit_suppl.contact_email,
+            "contact_phone": edit_suppl.contact_phone,
+        })
+
+def delete_supplier(request, id):
+    supplier = get_object_or_404(Supplier, id=id)
+    supplier.delete()
+    messages.success(request, 'Supplier deleted successfully')
+    return redirect('suppliers')  

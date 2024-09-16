@@ -1,15 +1,17 @@
 {% extends "inventorymanager/layout.html" %}
 
 {% block body %}
-<div class="container mt-3">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Order: {{ order.id }}</h1>
-            <p>Date: {{ order.order_date }}</p>
-            <!-- TODO -->
-        </div>
+
+<div class="card shadow mt-4">
+    <div class="card-header py-3">
+        <h2 class="m-0 font-weight-bold text-primary">Order number: {{ order.id }}</h2>
     </div>
-</div>
-            
+    <div class="card-body">
+            <p>Customer: {{ order.customer }}</p>
+            <p>Date: {{ order.order_date }}</p>
+            <p>Quantity: {{ orderItem.quantity }}</p>
+            <p>Unit price: {{ orderItem.unit_price }}</p>
+            <p>Product: {{ orderItem.product }}</p>
+    </div>
+</div>            
 {% endblock body %}
-    
