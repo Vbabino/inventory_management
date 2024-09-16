@@ -23,9 +23,13 @@ urlpatterns = [
     path('category/<int:id>/', views.category_detail, name='category_detail'),
     # Edit urls
     path('edit_supplier/<int:id>', views.edit_supplier, name='edit_supplier'),
+    path('edit_customer/<int:id>', views.edit_customer, name='edit_customer'),
+
 
     # Delete urls
     path('delete_supplier/<int:id>/', views.delete_supplier, name='delete_supplier'),
+    path('delete_customer/<int:id>/', views.delete_customer, name='delete_customer'),
+
 
 
 

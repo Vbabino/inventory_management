@@ -205,9 +205,31 @@ def edit_supplier(request,id):
             "contact_email": edit_suppl.contact_email,
             "contact_phone": edit_suppl.contact_phone,
         })
+    
+def edit_customer(request, id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        edit_cust =get_object_or_404(Customer, id=id)
+        edit_cust.first_name = data["first_name"]
+        edit_cust.last_name = data["last_name"]
+        edit_cust.email = data["email"]
+        edit_cust.phone = data['phone']
+        edit_cust.save()
+        return JsonResponse({
+            "first_name": edit_cust.first_name,
+            "last_name": edit_cust.last_name,
+            "email": edit_cust.email,
+            "phone": edit_cust.phone,
+        })
 
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier, id=id)
     supplier.delete()
     messages.success(request, 'Supplier deleted successfully')
     return redirect('suppliers')  
+
+def delete_customer(request, id):
+    customer = get_object_or_404(Customer, id=id)
+    customer.delete()
+    messages.success(request, 'Customer deleted successfully')
+    return redirect('customers')  
