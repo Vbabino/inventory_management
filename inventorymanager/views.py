@@ -85,9 +85,10 @@ def create_customer(request):
 @login_required
 def product_view(request):
     products = Product.objects.all()
-
+    
     return render(request, 'inventorymanager/products.html', {
-            "products": products
+            "products": products,
+            
         })
 
 @login_required
@@ -173,7 +174,8 @@ def customer_detail(request, id):
 @login_required
 def product_detail(request, id):
     product = get_object_or_404(Product, id=id)
-    return render(request, 'inventorymanager/product_detail.html', {'product': product})
+    form = ProductForm(instance=product)
+    return render(request, 'inventorymanager/product_detail.html', {'product': product, 'form': form})
 
 @login_required
 def order_detail(request, id):
@@ -222,6 +224,28 @@ def edit_customer(request, id):
             "phone": edit_cust.phone,
         })
 
+def edit_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == "POST":
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            updated_product = form.save()
+            # return redirect('product_detail', id=updated_product.id)
+            return JsonResponse({
+                'success': True,
+                "name": updated_product.name,
+                "description": updated_product.description,
+                "unit_cost": updated_product.unit_cost,
+                "quantity_in_stock": updated_product.quantity_in_stock,
+                "category": updated_product.category.name,
+                "supplier": updated_product.supplier.name,
+    
+        })
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'inventorymanager/product_detail.html', {'form': form})
+
+ 
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier, id=id)
     supplier.delete()
@@ -233,3 +257,9 @@ def delete_customer(request, id):
     customer.delete()
     messages.success(request, 'Customer deleted successfully')
     return redirect('customers')  
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    product.delete()
+    messages.success(request, 'Product deleted successfully')
+    return redirect('products') 

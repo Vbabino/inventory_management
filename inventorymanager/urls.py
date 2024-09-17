@@ -24,11 +24,15 @@ urlpatterns = [
     # Edit urls
     path('edit_supplier/<int:id>', views.edit_supplier, name='edit_supplier'),
     path('edit_customer/<int:id>', views.edit_customer, name='edit_customer'),
+    path('edit_product/<int:id>', views.edit_product, name='edit_product'),
+    
 
 
     # Delete urls
     path('delete_supplier/<int:id>/', views.delete_supplier, name='delete_supplier'),
     path('delete_customer/<int:id>/', views.delete_customer, name='delete_customer'),
+    path('delete_product/<int:id>/', views.delete_product, name='delete_product'),
+
 
 
 

@@ -35,8 +35,8 @@
             .then(result => {
                 
                 document.getElementById(`first_last_name_${id}`).innerHTML = `${result.first_name} ${result.last_name}`;
-                document.getElementById(`customer_email_p${id}`).innerHTML = `<strong>Contact Email:</strong> ${result.email}`;
-                document.getElementById(`customer_phone_p${id}`).innerHTML = `<strong>Contact Phone:</strong> ${result.phone}`;
+                document.getElementById(`customer_email_p${id}`).innerHTML = `<strong> Email:</strong> ${result.email}`;
+                document.getElementById(`customer_phone_p${id}`).innerHTML = `<strong> Phone:</strong> ${result.phone}`;
 
             })
             .catch(error => console.error('Error:', error));
@@ -48,23 +48,23 @@
         <h2 id="first_last_name_{{ customer.id }}" class="m-0 font-weight-bold text-primary">{{ customer.first_name }} {{ customer.last_name }}</h2>
     </div>
     <div class="card-body">
-        <p id="customer_email_p{{ customer.id }}">Email: {{ customer.email }}</p>
-        <p id="customer_phone_p{{ customer.id }}">Phone: {{ customer.phone }}</p>
+        <p id="customer_email_p{{ customer.id }}"><strong> Email: </strong>{{ customer.email }}</p>
+        <p id="customer_phone_p{{ customer.id }}"><strong> Phone: </strong>{{ customer.phone }}</p>
     </div>
 </div>       
 
 <div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary mt-2 me-2" data-toggle="modal" data-target="#modal_edit_customer_{{ customer.id }}">Edit customer</button>
-    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete customer</button>
+    <button type="button" class="btn btn-primary mt-2 me-2" data-bs-toggle="modal" data-bs-target="#modal_edit_customer_{{ customer.id }}">Edit customer</button>
+    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal">Delete customer</button>
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="modal_edit_customer_{{ customer.id }}" tabindex="-1" role="dialog" aria-labelledby="modal_edit_customer_{{ customer.id }}_label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="modal_edit_customer_{{ customer.id }}" tabindex="-1" aria-labelledby="modal_edit_customer_{{ customer.id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit customer</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title fs-5" id="modal_edit_customer_{{ customer.id }}Label">Edit customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Form group for first name -->
@@ -93,19 +93,19 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitHandler({{ customer.id }})" data-dismiss="modal">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitHandler({{ customer.id }})" data-bs-dismiss="modal" >Save Changes</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Customer</h1>
+          <h1 class="modal-title fs-5" id="deleteCustomerModalLabel">Delete Customer</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">

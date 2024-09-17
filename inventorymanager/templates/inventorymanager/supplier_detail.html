@@ -33,7 +33,6 @@
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result)
                 document.getElementById(`name_h2${id}`).innerHTML = result.name;
                 document.getElementById(`contact_name_p${id}`).innerHTML = `<strong>Contact Name:</strong> ${result.contact_name}`;
                 document.getElementById(`contact_email_p${id}`).innerHTML = `<strong>Contact Email:</strong> ${result.contact_email}`;
@@ -57,18 +56,18 @@
 </div>
 
 <div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary mt-2 me-2" data-toggle="modal" data-target="#modal_edit_supplier_{{ supplier.id }}">Edit supplier</button>
-    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete supplier</button>
+    <button type="button" class="btn btn-primary mt-2 me-2" data-bs-toggle="modal" data-bs-target="#modal_edit_supplier_{{ supplier.id }}">Edit supplier</button>
+    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete supplier</button>
 </div>
 
 
 <!-- Edit Modal -->
-<div class="modal fade" id="modal_edit_supplier_{{ supplier.id }}" tabindex="-1" role="dialog" aria-labelledby="modal_edit_supplier_{{ supplier.id }}_label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="modal_edit_supplier_{{ supplier.id }}" tabindex="-1" aria-labelledby="modal_edit_supplier_{{ supplier.id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Supplier</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title fs-5" id="modal_edit_supplier_{{ supplier.id }}Label">Edit Supplier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Form group for Name -->
@@ -86,32 +85,30 @@
                 <div class="form-group">
                     <label for="contact_email_{{ supplier.id }}">Contact Email</label>
                     <input type="text" id="contact_email_{{ supplier.id }}" class="form-control" value="{{ supplier.contact_email }}">
-                    <!-- <textarea name="content" rows="1" id="contact_email_{{ supplier.id }}" class="form-control">{{ supplier.contact_email }}</textarea> -->
                 </div>
 
                 <!-- Form group for Contact Phone -->
                 <div class="form-group">
                     <label for="contact_phone_{{ supplier.id }}">Contact Phone</label>
                     <input type="text" id="contact_phone_{{ supplier.id }}" class="form-control" value="{{ supplier.contact_phone }}">
-                    <!-- <textarea name="content" rows="1" id="contact_phone_{{ supplier.id }}" class="form-control">{{ supplier.contact_phone }}</textarea> -->
                 </div>
             </div>
 
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitHandler({{ supplier.id }})" data-dismiss="modal">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitHandler({{ supplier.id }})" data-bs-dismiss="modal">Save Changes</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Supplier</h1>
+          <h1 class="modal-title fs-5" id="deleteModalLabel">Delete Supplier</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
