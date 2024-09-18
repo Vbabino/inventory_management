@@ -65,7 +65,6 @@ class OrderItemForm(forms.ModelForm):
             raise forms.ValidationError('Quantity in stock must be greater than or equal to zero')
         return quantity
 
-OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=1, can_delete=False)
 
 class CategoryForm(forms.ModelForm):
     class Meta:

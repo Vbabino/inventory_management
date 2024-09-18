@@ -112,28 +112,33 @@ def order_view(request):
             "orders": orders
         })
 
+from django.forms import inlineformset_factory
+from .models import Order, OrderItem
+
 @login_required
 def create_order(request):
+    # Dynamically create the formset with extra=1 for the 'create' view
+    OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=1, can_delete=False)
+
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
         order_item_formset = OrderItemFormSet(request.POST)
 
         if order_form.is_valid() and order_item_formset.is_valid():
-            order = order_form.save()  
-            order_items = order_item_formset.save(commit=False)  # Don't commit to DB yet
+            order = order_form.save()
+            order_items = order_item_formset.save(commit=False)
 
             # Link each OrderItem to the newly created Order
             for item in order_items:
                 item.order = order
                 item.save()
 
-            return redirect('orders')  
+            return redirect('orders')
         else:
             messages.error(request, 'Please correct the errors below.')
-
     else:
         order_form = OrderForm()
-        order_item_formset = OrderItemFormSet()
+        order_item_formset = OrderItemFormSet()  
 
     return render(request, 'inventorymanager/createOrder.html', {
         'order_form': order_form,
@@ -181,9 +186,14 @@ def product_detail(request, id):
 def order_detail(request, id):
     order = get_object_or_404(Order, id=id)
     orderItem = get_object_or_404(OrderItem, id=id)
+    order_form = OrderForm(instance=order)
+    OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
+    formset = OrderItemFormSet(instance=order)
     return render(request, 'inventorymanager/order_detail.html', {
         'order': order,
-        'orderItem': orderItem
+        'orderItem': orderItem,
+        'order_form': order_form,
+        'formset': formset,
         })
 
 @login_required
@@ -230,7 +240,7 @@ def edit_product(request, id):
         form = ProductForm(request.POST, instance=product)
         if form.is_valid():
             updated_product = form.save()
-            # return redirect('product_detail', id=updated_product.id)
+            
             return JsonResponse({
                 'success': True,
                 "name": updated_product.name,
@@ -245,7 +255,45 @@ def edit_product(request, id):
         form = ProductForm(instance=product)
     return render(request, 'inventorymanager/product_detail.html', {'form': form})
 
- 
+
+def edit_order(request, order_id):
+    OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+        order_form = OrderForm(request.POST, instance=order)
+        formset = OrderItemFormSet(request.POST, instance=order)
+
+        if order_form.is_valid() and formset.is_valid():
+            order = order_form.save()
+            formset.save()
+
+            # Prepare updated order items data after saving
+            updated_items = []
+            for order_item in order.order_items.all():  
+                updated_items.append({
+                    'product': order_item.product.name,
+                    'quantity': order_item.quantity,
+                    'unit_price': order_item.unit_price,
+                })
+
+            return JsonResponse({
+                'success': True,
+                'customer_first_name': order.customer.first_name,
+                'customer_last_name': order.customer.last_name,
+                'order_items': updated_items  # Send updated order items in the response
+            })
+    else:
+        order_form = OrderForm(instance=order)
+        formset = OrderItemFormSet(instance=order)
+    
+    return render(request, 'inventorymanager/product_detail.html', {
+        'order_form': order_form,
+        'formset': formset,
+        'order': order
+    })
+
+
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier, id=id)
     supplier.delete()
@@ -263,3 +311,9 @@ def delete_product(request, id):
     product.delete()
     messages.success(request, 'Product deleted successfully')
     return redirect('products') 
+
+def delete_order(request, id):
+    order = get_object_or_404(Order, id=id)
+    order.delete()
+    messages.success(request, 'Order deleted successfully')
+    return redirect('orders') 
