@@ -2,7 +2,14 @@
 {% extends "inventorymanager/layout.html" %}
 
 {% block body %}
-
+{% if messages %}
+    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
 <h1 class="mt-4">Categories</h1>
 
 <a type="button" class="btn btn-primary mb-2" href="{% url 'create_category' %}">Add Category</a>

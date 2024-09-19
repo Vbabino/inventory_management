@@ -199,7 +199,8 @@ def order_detail(request, id):
 @login_required
 def category_detail(request, id):
     category = get_object_or_404(Category, id=id)
-    return render(request, 'inventorymanager/category_detail.html', {'category': category})
+    form = CategoryForm(instance=category)
+    return render(request, 'inventorymanager/category_detail.html', {'category': category, 'form': form})
 
 def edit_supplier(request,id):
     if request.method == "POST":
@@ -255,7 +256,6 @@ def edit_product(request, id):
         form = ProductForm(instance=product)
     return render(request, 'inventorymanager/product_detail.html', {'form': form})
 
-
 def edit_order(request, order_id):
     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
     order = get_object_or_404(Order, id=order_id)
@@ -293,6 +293,22 @@ def edit_order(request, order_id):
         'order': order
     })
 
+def edit_category(request, id):
+    category = get_object_or_404(Category, id=id)
+    if request.method == "POST":
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            updated_category = form.save()
+
+            return JsonResponse({
+                'success': True,
+                'name': updated_category.name,
+                'description': updated_category.description
+
+            })
+    else:
+        form = CategoryForm(instance=category)
+        return render(request, 'inventorymanager/category_detail.html', {'form': form})
 
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier, id=id)
@@ -317,3 +333,9 @@ def delete_order(request, id):
     order.delete()
     messages.success(request, 'Order deleted successfully')
     return redirect('orders') 
+
+def delete_category(request, id):
+    category =get_object_or_404(Category, id=id)
+    category.delete()
+    messages.success(request, 'Category deleted successfully')
+    return redirect('categories')
