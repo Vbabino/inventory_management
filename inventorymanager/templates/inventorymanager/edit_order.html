@@ -18,32 +18,30 @@
 
 </div>
 {% endif %}
-<h1 class="mt-4">Create a New Order</h1>
+
+<h1 class="mb-2 mt-2">Update Order</h1>
 <form method="post">
     {% csrf_token %}
-    
     <h3>Order Details</h3>
     {{ order_form|crispy }}
 
-    
     <h3>Order Items</h3>
-    {{ order_item_formset.management_form }}
-    
-    {% for form in order_item_formset %}
+    {{ formset.management_form }}
+
+    {% for form in formset %}
         <div>
             {{ form|crispy }}
 
         </div>
     {% endfor %}
-    
-        <div class="d-flex">
-                <div class=" flex-grow-1">
-                        <button type="submit" class="btn btn-primary">Create order</button>
-                </div>
-                <div >
-                        <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Go back</a>
-                </div>
+    <div class="d-flex">
+        <div class=" flex-grow-1">
+                <button type="submit" class="btn btn-primary">Update order</button>
         </div>
+        <div >
+                <a type="button" class="btn btn-secondary" href="{% url 'cancel_order_update' order.id %}">Go back</a>
+        </div>
+    </div>
 </form>
 
 {% endblock body %}

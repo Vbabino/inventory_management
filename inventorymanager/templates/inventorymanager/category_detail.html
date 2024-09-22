@@ -66,10 +66,20 @@
     </div> 
 </div> 
 
-<div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary mt-2 me-2" data-bs-toggle="modal" data-bs-target="#modal_edit_category_{{ category.id }}">Edit category</button>
-    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">Delete category</button>
+<div class="d-flex">
+    <div class="mt-2  flex-grow-1">
+        <a type="button" class="btn btn-secondary" href="{% url 'categories' %}">Go back</a>
+    </div>
+    <div class="mt-2 me-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_edit_category_{{ category.id }}">Edit category</button>
+        
+    </div>
+  <div class="mt-2 ">
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">Delete category</button>
+     
+  </div>
 </div>
+
 
 <!-- Edit Modal -->
 <div class="modal fade" id="modal_edit_category_{{ category.id }}" tabindex="-1" aria-labelledby="modal_edit_category_{{ category.id }}Label" aria-hidden="true">

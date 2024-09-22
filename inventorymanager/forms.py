@@ -61,8 +61,17 @@ class OrderItemForm(forms.ModelForm):
 
     def clean_quantity(self):
         quantity = self.cleaned_data.get('quantity')
+        product = self.cleaned_data.get('product')
+        
         if quantity is not None and quantity < 0:
-            raise forms.ValidationError('Quantity in stock must be greater than or equal to zero')
+            raise forms.ValidationError('Quantity must be greater than or equal to zero')
+
+        # Check if product is selected and if there's enough stock
+        if product and quantity > product.quantity_in_stock:
+            raise forms.ValidationError(
+                f'There are only {product.quantity_in_stock} items available in stock for this product.'
+            )
+
         return quantity
 
 

@@ -24,7 +24,14 @@
         <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <button type="submit" class="btn btn-primary">Create Category</button>
+                <div class="d-flex">
+                        <div class=" flex-grow-1">
+                                <button type="submit" class="btn btn-primary">Create category</button>
+                        </div>
+                        <div >
+                                <a type="button" class="btn btn-secondary" href="{% url 'categories' %}">Go back</a>
+                        </div>
+                </div>
         </form>
 </div>
 

@@ -27,18 +27,33 @@
                     "X-CSRFToken": csrfToken,
                 },
             })
-            .then(response => response.json())
+            
+            .then(response => {
+            // Handle non-200 HTTP status codes (e.g., 400 Bad Request)
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    console.error('Validation errors:', errorData.errors);
+                    // Display error messages to the user if needed
+                    return Promise.reject(errorData);  // Reject with errorData to jump to the catch block
+                });
+            }
+            return response.json();  // Return JSON data for success responses
+        })
+            
             .then(data => {
                 if (data.success) {
-                    console.log(data)
-                    // Update the DOM elements with the new order details
                     
-                    document.getElementById("order_customer_name_p{{ order.id }}").innerHTML = `<strong>Customer: </strong>${data.customer_first_name} ${data.customer_last_name}`;
-                    document.getElementById("order_quantity_p{{ order.id }}").innerHTML = `<strong>Quantity: </strong> ${data["order_items"][0]["quantity"]}`;
-                    document.getElementById("order_unit_price_p{{ order.id }}").innerHTML = `<strong>Unit price: </strong> ${data["order_items"][0]["unit_price"]}`;
-                    document.getElementById("order_product_p{{ order.id }}").innerHTML = `<strong>Product: </strong> ${data["order_items"][0]["product"]}`;
-
-                    // Close Bootstrap Modal
+                    // Update the DOM elements with the new order details
+                    data.order_items.forEach((item, index) => {
+                    
+                    const itemId = `${item.id}`;  
+                    
+                    document.getElementById(`order_quantity_p${itemId}`).innerHTML = `<strong>Quantity: </strong>${item.quantity}`;
+                    document.getElementById(`order_unit_price_p${itemId}`).innerHTML = `<strong>Unit price: </strong>${item.unit_price}`;
+                    document.getElementById(`order_product_p${itemId}`).innerHTML = `<strong>Product: </strong>${item.product}`;
+                    });
+                    
+                      // Close Bootstrap Modal
                     const modalElement = document.getElementById('modal_edit_order_{{ order.id }}');
                     const modal = bootstrap.Modal.getInstance(modalElement); // Initialize Bootstrap modal instance
                     modal.hide();
@@ -59,6 +74,28 @@
         });
     });
 
+    function loadEditOrder(orderId) {
+     fetch(`/edit_order/${orderId}/`, {
+         method: 'GET',
+         headers: {
+             'X-Requested-With': 'XMLHttpRequest'  // Mark this as an AJAX request
+         }
+     })
+     .then(response => {
+         if (response.ok) {
+             return response.text();  // Retrieve the HTML form content
+         }
+         throw new Error('Failed to load order edit form');
+     })
+     .then(htmlContent => {
+         // Insert the form content into the modal's body
+         document.querySelector(`#modal_edit_order_${orderId} .modal-body`).innerHTML = htmlContent;
+     })
+     .catch(error => {
+         console.error('Error loading order edit form:', error);
+     });
+}
+
 </script>
 
 <div class="card shadow mt-4">
@@ -68,51 +105,29 @@
     <div class="card-body">
             <p id="order_customer_name_p{{ order.id }}"><strong>Customer: </strong>{{ order.customer }}</p>
             <p ><strong>Date: </strong>{{ order.order_date }}</p>
-            <p id="order_quantity_p{{ order.id }}"><strong>Quantity:</strong> {{ orderItem.quantity }}</p>
-            <p id="order_unit_price_p{{ order.id }}"><strong>Unit price: </strong>{{ orderItem.unit_price }}</p>
-            <p id="order_product_p{{ order.id }}"><strong>Product:</strong> {{ orderItem.product }}</p>
+            {% for item in orderItem %}
+            
+            <p id="order_quantity_p{{ item.id }}"><strong>Quantity:</strong> {{ item.quantity }}</p>
+            <p id="order_unit_price_p{{ item.id }}"><strong>Unit price: </strong> {{ item.unit_price }}</p>
+            <p id="order_product_p{{ item.id }}"><strong>Product:</strong> {{ item.product }}</p>
+            {% endfor %}
     </div>
 </div>            
 
-<div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary mt-2 me-2" data-bs-toggle="modal" data-bs-target="#modal_edit_order_{{ order.id }}">Edit order</button>
-    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteOrderModal">Delete order</button>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="modal_edit_order_{{ order.id }}" tabindex="-1" aria-labelledby="modal_edit_order_{{ order.id }}Label" aria-hidden="true">
-    
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fs-5" id="modal_edit_order_{{ order.id }}Label">Edit order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <!-- Modal Boddy -->
-                
-                    <form id="order_form" method="post" action="{% url 'edit_order' order.id %}">
-                        {% csrf_token %}
-                        <h3>Order Details</h3>
-                        {{ order_form|crispy }}
-
-                        <h3>Order Items</h3>
-                        {{ formset.management_form }}
-                        
-                        {% for form in formset %}
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    {{ form|crispy }}
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <button id="submit_button" type="submit" class="btn btn-primary">Update Order</button>
-                    </form>
-                
-            </div>
-        </div>
+<div class="d-flex">
+    <div class="mt-2 flex-grow-1">
+        <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Go back</a>
+    </div>
+    <div class="mt-2 me-2">
+        <a type="button" class="btn btn-primary" href="{% url 'edit_order' order.id%}">Edit Order</a>
+    </div>
+    <div class="mt-2">
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteOrderModal">Delete order</button>
     </div>
 </div>
+
+
+
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteOrderModal" tabindex="-1" aria-labelledby="deleteOrderModalLabel" aria-hidden="true">

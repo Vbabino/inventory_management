@@ -55,9 +55,17 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary mt-2 me-2" data-bs-toggle="modal" data-bs-target="#modal_edit_supplier_{{ supplier.id }}">Edit supplier</button>
-    <button type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete supplier</button>
+
+<div class="d-flex">
+    <div class="mt-2 flex-grow-1">
+        <a type="button" class="btn btn-secondary" href="{% url 'suppliers' %}">Go back</a>
+    </div>
+    <div class="mt-2 me-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_edit_supplier_{{ supplier.id }}">Edit supplier</button>
+    </div>
+  <div class="mt-2">
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete supplier</button>
+  </div>
 </div>
 
 

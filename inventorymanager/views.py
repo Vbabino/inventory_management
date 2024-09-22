@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 import json
 from .forms import *
 
@@ -185,7 +186,7 @@ def product_detail(request, id):
 @login_required
 def order_detail(request, id):
     order = get_object_or_404(Order, id=id)
-    orderItem = get_object_or_404(OrderItem, id=id)
+    orderItem = OrderItem.objects.filter(order=order)
     order_form = OrderForm(instance=order)
     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
     formset = OrderItemFormSet(instance=order)
@@ -256,42 +257,59 @@ def edit_product(request, id):
         form = ProductForm(instance=product)
     return render(request, 'inventorymanager/product_detail.html', {'form': form})
 
+@transaction.atomic
 def edit_order(request, order_id):
     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
     order = get_object_or_404(Order, id=order_id)
+    
+    # **Restore stock quantities when entering the edit mode**
+    if request.method == "GET":
+        for order_item in order.order_items.all():
+            # Add back the original quantity to the product's stock
+            order_item.product.quantity_in_stock += order_item.quantity
+            order_item.product.save()
 
     if request.method == "POST":
         order_form = OrderForm(request.POST, instance=order)
         formset = OrderItemFormSet(request.POST, instance=order)
 
+        # Update the product quantities after the formset is saved
         if order_form.is_valid() and formset.is_valid():
+            # Save the order and formset
             order = order_form.save()
             formset.save()
 
-            # Prepare updated order items data after saving
-            updated_items = []
-            for order_item in order.order_items.all():  
-                updated_items.append({
-                    'product': order_item.product.name,
-                    'quantity': order_item.quantity,
-                    'unit_price': order_item.unit_price,
-                })
+            # Update the product quantities after the formset is saved
+            for order_item in order.order_items.all():
+        
+                order_item.product.save()
 
-            return JsonResponse({
-                'success': True,
-                'customer_first_name': order.customer.first_name,
-                'customer_last_name': order.customer.last_name,
-                'order_items': updated_items  # Send updated order items in the response
-            })
+            return redirect('orders')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+        
     else:
         order_form = OrderForm(instance=order)
         formset = OrderItemFormSet(instance=order)
     
-    return render(request, 'inventorymanager/product_detail.html', {
+    return render(request, 'inventorymanager/edit_order.html', {
         'order_form': order_form,
         'formset': formset,
         'order': order
     })
+
+def cancel_order_update(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "GET":
+        for order_item in order.order_items.all():
+            # Restoring current quantity in stock
+            order_item.product.quantity_in_stock -= order_item.quantity
+            order_item.product.save()
+    
+    return redirect('orders')
+    
 
 def edit_category(request, id):
     category = get_object_or_404(Category, id=id)
@@ -330,12 +348,16 @@ def delete_product(request, id):
 
 def delete_order(request, id):
     order = get_object_or_404(Order, id=id)
+    
+    for order_item in order.order_items.all():
+        order_item.delete()
+    
     order.delete()
     messages.success(request, 'Order deleted successfully')
     return redirect('orders') 
 
 def delete_category(request, id):
-    category =get_object_or_404(Category, id=id)
+    category = get_object_or_404(Category, id=id)
     category.delete()
     messages.success(request, 'Category deleted successfully')
     return redirect('categories')
