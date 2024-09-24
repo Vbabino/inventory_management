@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Customers',
+                label: 'Customer Revenue',
                 data: data,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',

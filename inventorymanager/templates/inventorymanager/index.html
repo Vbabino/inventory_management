@@ -14,7 +14,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             Orders</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ orders_total|floatformat:"g" }}</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ orders_total|floatformat:"2g" }}</div>
                     </div>
                     <div class="col-auto">
                         <i class="fa-solid fa-cart-shopping fa-2x text-gray-300"></i>
@@ -32,7 +32,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                             Products</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ products_total|floatformat:"g" }}</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ products_total|floatformat:"2g" }}</div>
                     </div>
                     <div class="col-auto">
                         <i class="fa-brands fa-product-hunt fa-2x text-gray-300"></i>
@@ -52,7 +52,7 @@
                         </div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
-                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">${{ revenue |floatformat:"g" }}</div>
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">${{ revenue |floatformat:"2g" }}</div>
                             </div>
                             
                         </div>
@@ -102,12 +102,12 @@
             </div>
         </div>
     </div>
-    <!-- Top Selling Products Chart -->
+    <!-- Top 3 Selling Products Chart -->
     <div class="col-xl-6">
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-bar me-1"></i>
-                Top Selling Products
+                Top 3 Selling Products
             </div>
             <div class="card-body"><canvas id="tpsChart" width="100%" height="40"></canvas>
                 <div id="tpsChartData" 
@@ -152,12 +152,12 @@
             </div>
         </div>
     </div>
-    <!-- Customer Orders Analysis Chart -->
+    <!-- Top 3 Customers Chart -->
     <div class="col-xl-4">
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-bar me-1"></i>
-                Customer Orders Analysis
+                Top 3 Customers
             </div>
             <div class="card-body"><canvas id="customerOrdersChart" width="100%" height="40"></canvas>
                 <div id="custumerOrdersChartData" 

@@ -43,6 +43,8 @@
                                 <th>Quantity in Stock</th>
                                 <th>Category</th>
                                 <th>Supplier</th>
+                                <th>Total value</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -50,10 +52,12 @@
                             <tr data-id="{{ product.id }}">
                                 <td>{{ product.name}}</td>
                                 <td>{{ product.description}}</td>
-                                <td>${{ product.unit_cost|floatformat:"g"}}</td>
+                                <td>${{ product.unit_cost|floatformat:"2g"}}</td>
                                 <td>{{ product.quantity_in_stock}}</td>
                                 <td>{{ product.category}}</td>
                                 <td>{{ product.supplier}}</td>
+                                <td>{{ product.total_value|floatformat:"2g"}}</td>
+
                             </tr>
                             {% endfor %}
                         </tbody>

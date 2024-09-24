@@ -38,7 +38,7 @@ def index(request):
         top_selling_products = (OrderItem.objects
                                 .values('product__name')
                                 .annotate(total_quantity_sold=Sum('quantity'))
-                                .order_by('-total_quantity_sold')
+                                .order_by('-total_quantity_sold')[:3]
                                 )
         tps_chart_labels = [item['product__name'] for item in top_selling_products]
         tps_chart_data = [item['total_quantity_sold'] for item in top_selling_products]
@@ -70,9 +70,9 @@ def index(request):
         customer_orders = (OrderItem.objects
                             .values('order__customer__first_name', 'order__customer__last_name')  
                             .annotate(total_spending=Sum(F('quantity') * F('unit_price')))  
-                            .order_by('-total_spending')  # Order by total spending in descending order
+                            .order_by('-total_spending')[:3]  
                         )
-        # sales_rev_labels = [f'Month {item["order__order_date__month"]}' for item in sales_data]
+        
         
         customer_orders_labels = [f"{item['order__customer__first_name']} {item['order__customer__last_name']}" for item in customer_orders]
         customer_orders_data = [float(item['total_spending']) for item in customer_orders]
@@ -170,7 +170,9 @@ def create_customer(request):
 
 @login_required
 def product_view(request):
-    products = Product.objects.all()
+    products = Product.objects.annotate(
+        total_value=Sum(F('quantity_in_stock') * F('unit_cost'))
+    )
     low_stock = Product.objects.filter(quantity_in_stock__lte=3)
 
     if low_stock.count() > 0:
@@ -200,7 +202,10 @@ def create_product(request):
     
 @login_required
 def order_view(request):
-    orders = Order.objects.all()
+    orders = Order.objects.annotate(
+        total_value=Sum(F('order_items__quantity') * F('order_items__unit_price'))
+    )
+    
     return render(request, 'inventorymanager/orders.html', {
             "orders": orders
         })
@@ -209,7 +214,7 @@ def order_view(request):
 
 @login_required
 def create_order(request):
-    # Dynamically create the formset with extra=1 for the 'create' view
+    
     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=1, can_delete=False)
 
     if request.method == 'POST':
@@ -224,7 +229,7 @@ def create_order(request):
             for item in order_items:
                 item.order = order
                 item.save()
-
+            messages.success(request, 'Order created successfully')
             return redirect('orders')
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -351,97 +356,6 @@ def edit_product(request, id):
         form = ProductForm(instance=product)
     return render(request, 'inventorymanager/product_detail.html', {'form': form})
 
-@login_required
-@transaction.atomic
-def edit_order(request, order_id):
-    OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
-    order = get_object_or_404(Order, id=order_id)
-
-    if request.method == "POST":
-        order_form = OrderForm(request.POST, instance=order)
-        formset = OrderItemFormSet(request.POST, instance=order)
-
-        if order_form.is_valid() and formset.is_valid():
-            # Save the order and formset
-            order = order_form.save()
-            
-            # Iterate through the formset to save each OrderItem
-            for form in formset:
-                order_item = form.save(commit=False)
-                product = order_item.product
-
-                # Calculate the difference in quantities
-                old_quantity = OrderItem.objects.get(pk=order_item.pk).quantity if order_item.pk else 0
-                difference = order_item.quantity - old_quantity
-                
-                # Ensure there's enough stock to accommodate the change
-                if difference > 0 and product.quantity_in_stock < difference:
-                    messages.error(request, f"Not enough stock for {product.name}. Only {product.quantity_in_stock} items left.")
-                    return render(request, 'inventorymanager/edit_order.html', {
-                        'order_form': order_form,
-                        'formset': formset,
-                        'order': order
-                    })
-                
-                # Adjust stock quantities based on the difference
-                product.quantity_in_stock -= difference
-                product.save()
-                order_item.save()
-            
-            return redirect('orders')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-        
-    else:
-        order_form = OrderForm(instance=order)
-        formset = OrderItemFormSet(instance=order)
-    
-    return render(request, 'inventorymanager/edit_order.html', {
-        'order_form': order_form,
-        'formset': formset,
-        'order': order
-    })
-
-
-# def edit_order(request, order_id):
-#     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
-#     order = get_object_or_404(Order, id=order_id)
-    
-#     # **Restore stock quantities when entering the edit mode**
-#     if request.method == "GET":
-#         for order_item in order.order_items.all():
-#             # Add back the original quantity to the product's stock
-#             order_item.product.quantity_in_stock += order_item.quantity
-#             order_item.product.save()
-
-#     if request.method == "POST":
-#         order_form = OrderForm(request.POST, instance=order)
-#         formset = OrderItemFormSet(request.POST, instance=order)
-
-#         # Update the product quantities after the formset is saved
-#         if order_form.is_valid() and formset.is_valid():
-#             # Save the order and formset
-#             order = order_form.save()
-#             formset.save()
-
-#             # Update the product quantities after the formset is saved
-#             for order_item in order.order_items.all():
-        
-#                 order_item.product.save()
-
-#             return redirect('orders')
-#         else:
-#             messages.error(request, 'Please correct the errors below.')
-        
-#     else:
-#         order_form = OrderForm(instance=order)
-#         formset = OrderItemFormSet(instance=order)
-    
-#     return render(request, 'inventorymanager/edit_order.html', {
-#         'order_form': order_form,
-#         'formset': formset,
-#         'order': order
-#     })
 
 
 @login_required
