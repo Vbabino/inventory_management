@@ -1,14 +1,28 @@
 {% extends "inventorymanager/layout.html" %}
 
 {% block body %}
-{% if messages %}
-    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+
+<div class="messages">
+    {% if messages %}
         {% for message in messages %}
-            {{ message }}
+            <!-- Error Messages -->
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <!-- Success Messages -->
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
         {% endfor %}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-{% endif %}
+    {% endif %}
+</div>
+
+
 <h1 class="mt-4">Products</h1>
 
 <a type="button" class="btn btn-primary mb-2" href="{% url 'create_product' %}">Add Product</a>
@@ -36,7 +50,7 @@
                             <tr data-id="{{ product.id }}">
                                 <td>{{ product.name}}</td>
                                 <td>{{ product.description}}</td>
-                                <td>{{ product.unit_cost}}</td>
+                                <td>${{ product.unit_cost|floatformat:"g"}}</td>
                                 <td>{{ product.quantity_in_stock}}</td>
                                 <td>{{ product.category}}</td>
                                 <td>{{ product.supplier}}</td>

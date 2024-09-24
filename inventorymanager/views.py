@@ -4,13 +4,98 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-import json
+from django.forms import inlineformset_factory
+from .models import Order, OrderItem
 from .forms import *
+from django.db.models import Sum, F
+import json
 
 def index(request):
     # Authenticated users view the Dashboard
     if request.user.is_authenticated:
-        return render(request, "inventorymanager/index.html", {})
+        low_stock = Product.objects.filter(quantity_in_stock__lte=3)
+        
+        orders_total = OrderItem.objects.annotate(
+                        total_price=F('quantity') * F('unit_price')  
+                    ).aggregate(sum_total=Sum('total_price'))['sum_total']
+        
+        product_total_cost = OrderItem.objects.annotate(
+                cost_calculation=F('quantity') * F('product__unit_cost')  
+            ).aggregate(total_cost_sum=Sum('cost_calculation'))['total_cost_sum']
+        
+        net_revenue = float(orders_total) - float(product_total_cost)
+        # Sales chart
+        sales_data = (OrderItem.objects
+                        .values('order__order_date__month')  
+                        .annotate(total_revenue=F('quantity') * F('unit_price'))
+                        .order_by('order__order_date__month')
+                        )
+
+        sales_rev_labels = [f'Month {item["order__order_date__month"]}' for item in sales_data]
+        sales_rev_data = [float(item["total_revenue"]) for item in sales_data]
+        
+        # Top Selling Products Chart
+        top_selling_products = (OrderItem.objects
+                                .values('product__name')
+                                .annotate(total_quantity_sold=Sum('quantity'))
+                                .order_by('-total_quantity_sold')
+                                )
+        tps_chart_labels = [item['product__name'] for item in top_selling_products]
+        tps_chart_data = [item['total_quantity_sold'] for item in top_selling_products]
+        
+        # Inventory levels Chart
+        inventory_levels = (Product.objects
+                            .values('name')
+                            .annotate(total_qty_in_stock = Sum('quantity_in_stock'))
+                            .order_by('-total_qty_in_stock')
+                            )
+        
+        il_chart_labels = [item['name'] for item in inventory_levels]
+        il_chart_data = [item['total_qty_in_stock'] for item in inventory_levels]
+
+        # Supplier Contribution Chart
+
+        supplier_contributions = (Product.objects
+                                    .values('supplier__name')  
+                                    .annotate(total_quantity=Sum('quantity_in_stock'))  
+                                    .order_by('-total_quantity')  
+                                )
+        
+        total_inventory = Product.objects.aggregate(total_quantity=Sum('quantity_in_stock'))['total_quantity']
+        sc_chart_labels = [item['supplier__name'] for item in supplier_contributions]
+        sc_chart_data = [ round((item['total_quantity'] / total_inventory) * 100, 2) if total_inventory else 0 for item in supplier_contributions]
+        
+        # Customer Orders Analysis
+
+        customer_orders = (OrderItem.objects
+                            .values('order__customer__first_name', 'order__customer__last_name')  
+                            .annotate(total_spending=Sum(F('quantity') * F('unit_price')))  
+                            .order_by('-total_spending')  # Order by total spending in descending order
+                        )
+        # sales_rev_labels = [f'Month {item["order__order_date__month"]}' for item in sales_data]
+        
+        customer_orders_labels = [f"{item['order__customer__first_name']} {item['order__customer__last_name']}" for item in customer_orders]
+        customer_orders_data = [float(item['total_spending']) for item in customer_orders]
+
+        context = {
+            "low_stock": low_stock.count(),
+            "products_total": product_total_cost,
+            'orders_total': orders_total,
+            'revenue': net_revenue,
+            'sales_rev_labels': json.dumps(sales_rev_labels) if sales_rev_labels else json.dumps([]),  
+            'sales_rev_data': json.dumps(sales_rev_data) if sales_rev_data else json.dumps([]),
+            'tps_chart_labes': json.dumps(tps_chart_labels) if tps_chart_labels else json.dumps([]),
+            'tps_chart_data': json.dumps(tps_chart_data) if tps_chart_data else json.dumps([]),
+            'il_chart_labels': json.dumps(il_chart_labels) if il_chart_labels else json.dumps([]),
+            'il_chart_data': json.dumps(il_chart_data) if il_chart_data else json.dumps([]),
+            'sc_chart_labels': json.dumps(sc_chart_labels) if sc_chart_labels else json.dumps([]),
+            'sc_chart_data': json.dumps(sc_chart_data) if sc_chart_data else json.dumps([]),
+            'customer_orders_labels': json.dumps(customer_orders_labels) if customer_orders_labels else json.dumps([]),
+            'customer_orders_data': json.dumps(customer_orders_data) if customer_orders_data else json.dumps([]),
+
+            }
+
+        return render(request, "inventorymanager/index.html", context)
     else:
         return redirect("login")
 
@@ -86,7 +171,14 @@ def create_customer(request):
 @login_required
 def product_view(request):
     products = Product.objects.all()
-    
+    low_stock = Product.objects.filter(quantity_in_stock__lte=3)
+
+    if low_stock.count() > 0:
+        if low_stock.count() > 1:
+            messages.error(request, f'{low_stock.count()} items have low stock')
+        else:
+            messages.error(request, f'{low_stock.count()} item has low stock')
+
     return render(request, 'inventorymanager/products.html', {
             "products": products,
             
@@ -113,8 +205,7 @@ def order_view(request):
             "orders": orders
         })
 
-from django.forms import inlineformset_factory
-from .models import Order, OrderItem
+
 
 @login_required
 def create_order(request):
@@ -203,6 +294,7 @@ def category_detail(request, id):
     form = CategoryForm(instance=category)
     return render(request, 'inventorymanager/category_detail.html', {'category': category, 'form': form})
 
+@login_required
 def edit_supplier(request,id):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -219,7 +311,8 @@ def edit_supplier(request,id):
             "contact_email": edit_suppl.contact_email,
             "contact_phone": edit_suppl.contact_phone,
         })
-    
+
+@login_required
 def edit_customer(request, id):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -235,7 +328,8 @@ def edit_customer(request, id):
             "email": edit_cust.email,
             "phone": edit_cust.phone,
         })
-
+    
+@login_required
 def edit_product(request, id):
     product = get_object_or_404(Product, id=id)
     if request.method == "POST":
@@ -257,33 +351,43 @@ def edit_product(request, id):
         form = ProductForm(instance=product)
     return render(request, 'inventorymanager/product_detail.html', {'form': form})
 
+@login_required
 @transaction.atomic
 def edit_order(request, order_id):
     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
     order = get_object_or_404(Order, id=order_id)
-    
-    # **Restore stock quantities when entering the edit mode**
-    if request.method == "GET":
-        for order_item in order.order_items.all():
-            # Add back the original quantity to the product's stock
-            order_item.product.quantity_in_stock += order_item.quantity
-            order_item.product.save()
 
     if request.method == "POST":
         order_form = OrderForm(request.POST, instance=order)
         formset = OrderItemFormSet(request.POST, instance=order)
 
-        # Update the product quantities after the formset is saved
         if order_form.is_valid() and formset.is_valid():
             # Save the order and formset
             order = order_form.save()
-            formset.save()
+            
+            # Iterate through the formset to save each OrderItem
+            for form in formset:
+                order_item = form.save(commit=False)
+                product = order_item.product
 
-            # Update the product quantities after the formset is saved
-            for order_item in order.order_items.all():
-        
-                order_item.product.save()
-
+                # Calculate the difference in quantities
+                old_quantity = OrderItem.objects.get(pk=order_item.pk).quantity if order_item.pk else 0
+                difference = order_item.quantity - old_quantity
+                
+                # Ensure there's enough stock to accommodate the change
+                if difference > 0 and product.quantity_in_stock < difference:
+                    messages.error(request, f"Not enough stock for {product.name}. Only {product.quantity_in_stock} items left.")
+                    return render(request, 'inventorymanager/edit_order.html', {
+                        'order_form': order_form,
+                        'formset': formset,
+                        'order': order
+                    })
+                
+                # Adjust stock quantities based on the difference
+                product.quantity_in_stock -= difference
+                product.save()
+                order_item.save()
+            
             return redirect('orders')
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -298,6 +402,49 @@ def edit_order(request, order_id):
         'order': order
     })
 
+
+# def edit_order(request, order_id):
+#     OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=0, can_delete=False)
+#     order = get_object_or_404(Order, id=order_id)
+    
+#     # **Restore stock quantities when entering the edit mode**
+#     if request.method == "GET":
+#         for order_item in order.order_items.all():
+#             # Add back the original quantity to the product's stock
+#             order_item.product.quantity_in_stock += order_item.quantity
+#             order_item.product.save()
+
+#     if request.method == "POST":
+#         order_form = OrderForm(request.POST, instance=order)
+#         formset = OrderItemFormSet(request.POST, instance=order)
+
+#         # Update the product quantities after the formset is saved
+#         if order_form.is_valid() and formset.is_valid():
+#             # Save the order and formset
+#             order = order_form.save()
+#             formset.save()
+
+#             # Update the product quantities after the formset is saved
+#             for order_item in order.order_items.all():
+        
+#                 order_item.product.save()
+
+#             return redirect('orders')
+#         else:
+#             messages.error(request, 'Please correct the errors below.')
+        
+#     else:
+#         order_form = OrderForm(instance=order)
+#         formset = OrderItemFormSet(instance=order)
+    
+#     return render(request, 'inventorymanager/edit_order.html', {
+#         'order_form': order_form,
+#         'formset': formset,
+#         'order': order
+#     })
+
+
+@login_required
 def cancel_order_update(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
@@ -310,7 +457,7 @@ def cancel_order_update(request, order_id):
     
     return redirect('orders')
     
-
+@login_required
 def edit_category(request, id):
     category = get_object_or_404(Category, id=id)
     if request.method == "POST":
@@ -328,24 +475,28 @@ def edit_category(request, id):
         form = CategoryForm(instance=category)
         return render(request, 'inventorymanager/category_detail.html', {'form': form})
 
+@login_required
 def delete_supplier(request, id):
     supplier = get_object_or_404(Supplier, id=id)
     supplier.delete()
     messages.success(request, 'Supplier deleted successfully')
     return redirect('suppliers')  
 
+@login_required
 def delete_customer(request, id):
     customer = get_object_or_404(Customer, id=id)
     customer.delete()
     messages.success(request, 'Customer deleted successfully')
     return redirect('customers')  
 
+@login_required
 def delete_product(request, id):
     product = get_object_or_404(Product, id=id)
     product.delete()
     messages.success(request, 'Product deleted successfully')
     return redirect('products') 
 
+@login_required
 def delete_order(request, id):
     order = get_object_or_404(Order, id=id)
     
@@ -356,8 +507,10 @@ def delete_order(request, id):
     messages.success(request, 'Order deleted successfully')
     return redirect('orders') 
 
+@login_required
 def delete_category(request, id):
     category = get_object_or_404(Category, id=id)
     category.delete()
     messages.success(request, 'Category deleted successfully')
     return redirect('categories')
+

@@ -46,12 +46,16 @@ class ProductForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model =  Order
-        fields = ['customer']
+        fields = ['customer', 'order_date']
+        widgets = {
+            'order_date': forms.DateInput(attrs={'type': 'date'})
+        }
 
 class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'unit_price']
+        
     
     def clean_unit_price(self):
         unit_price = self.cleaned_data.get('unit_price')

@@ -1,8 +1,173 @@
 {% extends "inventorymanager/layout.html" %}
 
-
 {% block body %}
 <h1 class="mt-4">Dashboard</h1>
+
+<!-- Cards -->
+<div class="row">
+
+    <!-- Orders' Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ orders_total|floatformat:"g" }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa-solid fa-cart-shopping fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product's Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Products</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ products_total|floatformat:"g" }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa-brands fa-product-hunt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Card  -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Net Revenue
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">${{ revenue |floatformat:"g" }}</div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock items -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            Low Stock items</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{low_stock}}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fa-solid fa-triangle-exclamation fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row">
+    <!-- Sales Revenue Over Time Chart-->
+    <div class="col-xl-6" >
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Sales Revenue Over Time
+            </div> 
+            <div class="card-body"><canvas id="salesRevenueChart" width="100%" height="40"></canvas>
+                <div id="salesChartData" 
+                data-labels="{{ sales_rev_labels }}" 
+                data-data="{{ sales_rev_data }}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Top Selling Products Chart -->
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Top Selling Products
+            </div>
+            <div class="card-body"><canvas id="tpsChart" width="100%" height="40"></canvas>
+                <div id="tpsChartData" 
+                data-labels="{{ tps_chart_labes }}" 
+                data-data="{{ tps_chart_data }}">
+            </div>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Inventory Levels Chart -->
+    <div class="col-xl-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Inventory Levels
+            </div>
+            <div class="card-body"><canvas id="inventoryChart" width="100%" height="40"></canvas>
+                <div id="inventoryChartData" 
+                data-labels="{{ il_chart_labels }}" 
+                data-data="{{ il_chart_data }}">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Supplier Contribution Chart -->
+    <div class="col-xl-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-pie me-1"></i>
+                Supplier Contribution
+            </div>
+            <div class="card-body"><canvas id="supplierContributionChart" width="100%" height="40"></canvas>
+                <div id="supplierContributionChartData" 
+                data-labels="{{ sc_chart_labels }}" 
+                data-data="{{ sc_chart_data }}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Customer Orders Analysis Chart -->
+    <div class="col-xl-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Customer Orders Analysis
+            </div>
+            <div class="card-body"><canvas id="customerOrdersChart" width="100%" height="40"></canvas>
+                <div id="custumerOrdersChartData" 
+                data-labels="{{ customer_orders_labels }}" 
+                data-data="{{ customer_orders_data }}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock body %}
     

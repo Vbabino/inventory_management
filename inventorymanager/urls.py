@@ -37,6 +37,8 @@ urlpatterns = [
     path('delete_order/<int:id>/', views.delete_order, name='delete_order'),
     path('delete_category/<int:id>/', views.delete_category, name='delete_category'),
 
+    
+
 
 
 

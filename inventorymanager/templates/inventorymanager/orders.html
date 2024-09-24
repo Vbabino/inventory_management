@@ -36,11 +36,11 @@
                                 {% for item in order.order_items.all %}
                                 <tr data-id="{{ order.id }}">
                                     <td>{{ order.id }}</td>
-                                    <td>{{ order.order_date }}</td>
+                                    <td>{{ order.order_date|date:"d/m/Y" }}</td>
                                     <td>{{ order.customer.first_name }} {{ order.customer.last_name }}</td>
                                     <td>{{ item.product.name }}</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td>${{ item.unit_price }}</td>
+                                    <td>${{ item.unit_price |floatformat:"g"}}</td>
                                 </tr>
                                 {% endfor %}
                             {% endfor %}
