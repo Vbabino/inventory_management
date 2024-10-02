@@ -9,7 +9,7 @@
     </div>
     <div class="card-body">
             <p id="order_customer_name_p{{ order.id }}"><strong>Customer: </strong>{{ order.customer }}</p>
-            <p ><strong>Date: </strong>{{ order.order_date }}</p>
+            <p ><strong>Date: </strong>{{ order.order_date|date:"M j, Y"}}</p>
             {% for item in orderItem %}
             
             <p id="order_quantity_p{{ item.id }}"><strong>Quantity:</strong> {{ item.quantity }}</p>

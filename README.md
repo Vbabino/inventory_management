@@ -22,7 +22,7 @@ Overall, this project goes beyond a simple CRUD application by incorporating adv
 
 This project follows a standard Django file structure. The main application logic resides in the `inventorymanager` app, which contains essential files such as `models.py` for defining database models, `views.py` for handling request logic, `urls.py` for routing, `forms.py` for handling form validation, and `admin.py` for Django admin configurations. Database migrations are stored in the `migrations` folder, which includes automatically generated migration files. The HTML templates are located within the `templates/inventorymanager` directory, where individual pages such as `orders.html`, `customers.html`, and `index.html` are stored.
 
-Static assets are placed in the `inventory_system/static/inventorymanager/` folder. This includes `styles.css` for custom styling, JavaScript files for DataTables.js, Chart.js visualizations, and any other front-end logic. The `js` folder houses files for initializing DataTables and charts. The `requirements.txt` file lists all the necessary dependencies for the project, including `django-crispy-forms`, and the SQLite database is saved as `db.sqlite3`.
+Static assets are placed in the `inventory_system/static/inventorymanager/` folder. This includes `styles.css` for custom styling, JavaScript files for DataTables.js, Chart.js visualizations, and any other front-end logic. The `js` folder houses files for initializing DataTables and charts. The `requirements.txt` file lists all the necessary dependencies for the project, including `django-crispy-forms`, and there is a file with sample data saved as `sample_data.json`.
 
 The `venv` directory contains the virtual environment for the project, which isolates the dependencies needed for the app. Lastly, the `manage.py` file is the entry point for running the application and handling administrative tasks like migrations and starting the server.
 
@@ -58,14 +58,14 @@ The `venv` directory contains the virtual environment for the project, which iso
     python manage.py migrate
     ```
 
-5. **Create a Superuser** (Admin):
+5. **Load Sample Data**:
     ```
-    python manage.py createsuperuser
+    python manage.py loaddata sample_data.json
     ```
 
-6. **Collect Static Files**:
+6. **Create a Superuser** (Admin):
     ```
-    python manage.py collectstatic
+    python manage.py createsuperuser
     ```
 
 7. **Run the Development Server**:
