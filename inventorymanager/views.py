@@ -128,6 +128,7 @@ def create_supplier(request):
         form = SupplierForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Supplier created successfully')
             return redirect("suppliers")
 
         else:
@@ -159,6 +160,7 @@ def create_customer(request):
         form = CustomerForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Customer created successfully')
             return redirect("customers")
         
         else:
@@ -192,8 +194,8 @@ def create_product(request):
         form = ProductForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Product created successfully')
             return redirect("products")
-
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -255,6 +257,7 @@ def create_category(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Category created successfully')
             return redirect("categories")
         else:
             messages.error(request, 'Please correct the errors below.')

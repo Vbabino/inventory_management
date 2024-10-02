@@ -37,7 +37,7 @@ The `venv` directory contains the virtual environment for the project, which iso
 
 1. **Clone the Repository**:
     ```
-    git clone <repository-url>
+    git clone https://github.com/Vbabino/inventory_management.git
     cd inventory_management
     ```
 
