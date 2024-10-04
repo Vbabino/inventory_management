@@ -1,7 +1,7 @@
 # Inventory Management System
 
 ## Overview
-This project is an Inventory Management System designed to help small businesses manage their products, suppliers, orders, and customers efficiently. It is built using Django for the backend and a combination of HTML, CSS (Bootstrap), and JavaScript (with Chart.js and DataTables.js) for the frontend. The application allows authenticated users to perform CRUD (Create, Read, Update, Delete) operations on inventory data, and generate various insightful reports and charts, providing a robust and interactive interface.
+This project is an Inventory Management System designed to help small businesses manage their products, suppliers, orders, and customers efficiently. It is built using Django for the backend and a combination of HTML, CSS (Bootstrap), and JavaScript (with Chart.js and DataTables.js) for the frontend. The application allows authenticated users to perform CRUD (Create, Read, Update, Delete) operations on inventory data, and generate various insightful reports and charts, providing a robust and interactive interface. [Watch a demo here.](https://www.youtube.com/watch?v=YwB0Oorlses)
 
 ## Distinctiveness and Complexity
 
